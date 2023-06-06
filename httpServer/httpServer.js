@@ -1,6 +1,7 @@
 const http = require("http");
 
 const fs = require("fs").promises;
+
 const server = http.createServer(async (req, res) => {
   res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
   //   res.write("<h1>Hello Node</h1>");
@@ -24,4 +25,8 @@ server.listen(8080, () => {
 
 server.on("error", (err) => {
   console.log("Error Occured :: ", err);
+});
+
+process.on("uncaughtException", (err) => {
+  console.log("Uncaught Exception Handler ==== ", err);
 });
