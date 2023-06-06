@@ -1,17 +1,12 @@
-console.log("Hello World");
+const express = require("express");
+const app = express();
 
-setImmediate(() => {
-  console.log("immediate 1");
+app.set("port", process.env.PORT || 3000);
+
+app.get("/", (req, res, next) => {
+  res.send("익스프레스 서버 첫 메시지");
 });
 
-setTimeout(() => {
-  console.log("timeout 3");
-}, 0);
-
-Promise.resolve().then(() => console.log("promise 4"));
-
-process.nextTick(() => {
-  console.log("nextTick 2");
+app.listen(app.get("port"), () => {
+  console.log(`${app.get("port")}번 포트에서 대기중`);
 });
-
-console.log("결과는 nextTick 2", "promise 4", "immediate 1 ", "timeout 4순위");
