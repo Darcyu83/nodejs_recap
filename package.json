@@ -19,6 +19,7 @@
   "homepage": "https://github.com/Darcyu83/nodejs_recap#readme",
   "dependencies": {
     "cookie-parser": "^1.4.6",
+    "dotenv": "^16.1.4",
     "express": "^4.18.2",
     "express-session": "^1.17.3",
     "morgan": "^1.10.0",

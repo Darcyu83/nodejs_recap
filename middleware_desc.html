@@ -1,0 +1,38 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>미들웨어 설명</title>
+  </head>
+  <body>
+    <h1>미들웨어 설명 1</h1>
+    <h3>HTML파일 전송</h3>
+    <p>res.sendFile(path.join(__dirname, "index.html"));</p>
+    <hr />
+    <h3>미들웨어 셋팅</h3>
+    <p>
+      app.get( "/", (req, res, next) => { // res.send("익스프레스 서버 첫
+      메시지"); res.sendFile(path.join(__dirname, "index.html")); next(); },
+      (req, res) => { throw new Error("에러는 에러 처리 미들웨어로 갑니다."); }
+      );
+    </p>
+    <p>next() 호출하면 다음 미들웨어로 간다.</p>
+    <hr />
+    <h3>미들웨어 + URL</h3>
+    <p>app.use(미들웨어) :: 모든 요청에서 미들웨어 실행</p>
+    <p>app.use('/abc', 미들웨어) :: abc로 시작하는 요청에서 미들웨어 실행</p>
+    <p>
+      app.post('/abc', 미들웨어) :: abc로 시작하는 POST 요청에서 미들웨어 실행
+    </p>
+    <hr />
+    <h3>app.use('/abc' 미들웨어)에서 app.post('/abc',미들웨어)로 이동</h3>
+    <p>
+      app.use("/abc", (req, res, next) => { console.log('next()함수로 호출해줘야
+      다음 미들웨어로 이동'); next(); });
+    </p>
+    <hr />
+    <h3>에러 처리 미들웨어 :: 매개변수가 err, req, res, next로 네 개</h3>
+    <p>실무에서는 직접 에러 처리 미들웨어를 연결</p>
+    <p>에러 처리 미들웨어는 특별한 경우가 아니면 가장 아래에 위치</p>
+    <hr />
+  </body>
+</html>
