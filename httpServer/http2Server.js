@@ -22,7 +22,7 @@ const server = http2.createServer(
     //   res.end("<p>Hello Server!</p>");
 
     try {
-      const data = await fs.readFile("./html/welcome.html");
+      const data = await fs.readFile("./views/html/welcome.html");
 
       res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
       res.end(data);

@@ -6,7 +6,7 @@ const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const multer = require("multer");
 const fs = require("fs");
-
+const nunjucks = require("nunjucks");
 const checkIfFolderExisting = () => {
   const folderPath = path.resolve(__dirname, "uploads");
   try {
@@ -32,8 +32,25 @@ const upload = multer({
 
 // 환경변수 설정
 dotenv.config();
+
+// 라우터's
+const homeRouter = require("./routes");
+const userRouter = require("./routes/user");
+
 const app = express();
 app.set("port", process.env.PORT || 8080);
+// 포그파일을 view로
+// app.set("views", path.join(__dirname, "views", "pug")); // 퍼그 파일 저장위치
+// app.set("view engine", "pug");
+
+// 넌적스 파일을 vies로
+app.set("views", path.join(__dirname, "views", "nunjucks"));
+app.set("view engine", "njk");
+// app.set("view engine", "html"); njk html 둘다 가능
+nunjucks.configure(path.join("views", "nunjucks"), {
+  express: app,
+  watch: true,
+});
 
 // 업로드 폴더 체크 및 생성
 checkIfFolderExisting();
@@ -56,63 +73,29 @@ app.use(
   })
 );
 
-// 미들웨어
 // 스태틱 파일 위치 : 이미지, 아이콘, 파비콘 등
 app.use("/", express.static(path.join(__dirname, "public")));
 
+// 라우터
+app.use("/", homeRouter);
+app.use("/user", userRouter);
+
 app.use((req, res, next) => {
-  console.log("매 요청에 실행되는 미들웨어");
-  next();
+  console.log("매 요청에 실행되는 미들웨어 === 없는 주소일 경우");
+
+  const error = new Error(`${req.method} ${req.url} 라우터가 없습니다.`);
+  error.status = 404;
+  next(error);
 });
 
-app.use("/", (req, res, next) => {
-  console.log("app.use '/' 실행");
-  next();
-});
-
-app.get(
-  "/",
-  (req, res, next) => {
-    console.log("app.get '/' 실행");
-    // res.send("익스프레스 서버 첫 메시지");
-    // res.sendFile(path.join(__dirname, "index.html"));
-    // res.sendFile(path.join(__dirname, "/views/html/middleware_desc.html"));
-    // res.sendFile(path.join(__dirname, "/views/html/middleware_usage_desc.html"));
-    res.sendFile(path.join(__dirname, "/views/html/multer_upload.html"));
-
-    // next();
-    // next(new Error("이건 에러 처리 미들웨어로 바로감."));
-  },
-  (req, res) => {
-    throw new Error(
-      "바로 앞 미들웨어에서 next 된 후  에러 발생!! 에러 처리 미들웨어로 갑니다."
-    );
-  }
-);
-
-app.get("/upload", (req, res, next) => {
-  res.sendFile(path.join(__dirname, "/views/html/multer_upload.html"));
-});
-
-// 첨부파일 1개
-// app.post("/upload", upload.single("image"), (req, res) => {
-// input multiple 같은 name
-app.post("/upload", upload.array("images"), (req, res) => {
-  // input 태그 여러개 이름도 여러개 파일 업로드
-  // app.post(
-  //   "/upload",
-  //   upload.fields([{ name: "image1" }, { name: "image2" }]),
-  //   (req, res) => {
-  // app.post("/upload", upload.none(), (req, res) => {  // 파일 없을때 req.body로 모두 담음 : 파일있으면 오류남
-
-  // console.log("/upload === 1 ", req.file, req.body);
-  console.log("/upload === 1 ", req.files, req.body);
-  res.status(200).redirect("/");
-});
-
+// 에러처리 미들웨어
 app.use((err, req, res, next) => {
   console.error("에러 미들웨어:: ", err);
-  res.status(500).send(err.message);
+
+  res.locals.message = err.message;
+  res.locals.error = process.env.NODE_ENV !== "production" ? err : {};
+  res.status(err.status || 500);
+  res.render("error");
 });
 
 app.listen(app.get("port"), () => {
