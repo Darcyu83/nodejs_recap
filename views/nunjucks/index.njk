@@ -1,0 +1,23 @@
+{% extends 'layout.html' %}
+
+{% set secondTitle = "로컬 두번째 타이틀" %}
+{% set thirdTitle = title + " 타이틀변수 from server" %}
+
+
+ 
+ {% block content %}
+    <h1>{{title}}</h1>
+    <p>Welcome to {{title}}</p>
+
+
+    <p>Welcome to secondTitle:: {{secondTitle}}</p>
+    <p>Welcome to thirdTitle:: {{thirdTitle}}</p>
+
+    <button class="{{title}}" type="submit">전송</button>
+    <input placeholder ="{{title}} 연습" />
+
+
+    <p> {{'<strong>이스케이프 테스트</strong>'}} </p>
+    <p> {{'<strong>이스케이프 테스트</strong>' | safe}} </p>
+{% endblock %}
+

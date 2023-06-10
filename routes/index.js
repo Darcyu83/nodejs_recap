@@ -5,9 +5,9 @@ const router = express.Router();
 router.get(
   "/",
   (req, res, next) => {
-    // return next("route");
+    return next("route");
     // res.send("Hello, Home");
-    next();
+    // next();
   },
   (req, res) => {
     res.send("실행 되나요? next(`route`)때문에 안되요! ");
@@ -21,7 +21,7 @@ router.get(
 );
 
 router.get("/", (req, res) => {
-  res.send("Hello, 난 next(`route`)야");
+  res.render("index", { title: "yuds" });
 });
 
 module.exports = router;
