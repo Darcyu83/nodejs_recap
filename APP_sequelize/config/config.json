@@ -1,0 +1,24 @@
+{
+  "development": {
+    "username": "root",
+    "password": "yuds1983",
+    "database": "nodejs_book",
+    "host": "127.0.0.1",
+    "dialect": "mysql",
+    "logging": true
+  },
+  "test": {
+    "username": "root",
+    "password": null,
+    "database": "nodejs_book",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  },
+  "production": {
+    "username": "root",
+    "password": null,
+    "database": "nodejs_book",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  }
+}
