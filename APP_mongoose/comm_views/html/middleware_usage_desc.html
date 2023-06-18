@@ -1,0 +1,141 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>미들웨어 설명</title>
+  </head>
+  <body>
+    <h1>각 미들웨어 사용 목적 설명</h1>
+    <h3>dotenv.config()</h3>
+    <p>보안과 설정의 편의성 때문</p>
+    <p>.env 파일을 읽어서 process.env로 만듬</p>
+    <hr />
+    <h3>app.use(morgan('dev'));</h3>
+    <p>요청과 응답에 대한 정보를 콘솔에 기록</p>
+    <p>개발 환경에서는 dev를, 배포 환경에서는 combined를 애용</p>
+    <hr />
+    <h3>app.use('요청 경로', express.static('실제 경로'));</h3>
+    <p>app.use('/', express.static(path.join(__dirname, 'public')));</p>
+    <p>express 객체 안에서 꺼내 장착</p>
+    <p>함수의 인수로 정적 파일들이 담겨 있는 폴더</p>
+    <p>
+      public/stylesheets/style.css는
+      http://localhost:3000/stylesheets/style.css로 접근
+    </p>
+    <p>
+      public 폴더를 만들고 나서 css나 js, 이미지 파일들을 public 폴더에 넣으면
+      브라우저에서 접근
+    </p>
+    <p>
+      요청 경로에 해당하는 파일이 없으면 알아서 내부적으로 next를 호출합니다.
+      파일을 발견했다면 다음 미들웨어는 실행되지 않음
+    </p>
+    <hr />
+    <h3>
+      body-parser::폼 데이터나 AJAX 요청의 데이터데이터를 해석해서 req.body
+      객체로 만들어 줌
+    </h3>
+    <p>
+      익스프레스 4.16.0 버전부터 body-parser 미들웨어의 일부 기능이 익스프레스에
+      내장되었으므로 따로 설치할 필요없음
+    </p>
+    <p>app.use(express.json());</p>
+    <p>app.use(express.urlencoded({ extended: false }));</p>
+    <p>
+      보통 폼 데이터나 AJAX 요청의 데이터를 처리합니다. 단, 멀티파트(이미지,
+      동영상, 파일) 데이터는 처리하지 못합니다. 이 경우에는 뒤에 나오는 multer
+      모듈을 사용하면 됩니다.
+    </p>
+    <p>
+      body-parser는 직접 설치해야 하는 경우:: JSON과 URL-encoded 형식의 데이터
+      외에도 Raw, Text 형식의 데이터를 추가로 해석, Raw는 요청의 본문이 버퍼
+      데이터일 때, Text는 텍스트 데이터일 때 해석하는 미들웨어
+    </p>
+    <p>const bodyParser = require('body-parser');</p>
+    <p>app.use(bodyParser.raw());</p>
+    <p>app.use(bodyParser.text());</p>
+    <h2>요청 데이터 종류</h2>
+    <p>JSON은 JSON 형식의 데이터 전달 방식</p>
+    <p>URL-encoded는 주소 형식으로 데이터를 보내는 방식</p>
+    <p>폼 전송은 URL-encoded 방식을 주로 사용</p>
+    <p>
+      urlencoded 메서드를 보면 { extended: false }라는 옵션, false이면 노드의
+      querystring 모듈을 사용해 쿼리스트링을 해석하고, true이면 qs 모듈을 사용해
+      쿼리스트링을 해석, qs 모듈은 내장 모듈이 아니라 npm 패키지이며,
+      querystring 모듈의 기능을 좀 더 확장한 모듈
+    </p>
+
+    <p>
+      req.on("data") / req.on('end')와 같은 스트림형식 직접 처리할 필요가
+      없어짐.
+    </p>
+    <p>JSON 형식으로 { name: 'zerocho', book: 'nodejs' }를 본문으로 보냄</p>
+    <p>URL-encoded 형식으로 name=zerocho&book=nodejs를 본문으로 보냄</p>
+    <p>모두 req.body에 { name: 'zerocho', book: 'nodejs' }</p>
+    <hr />
+    <h3>multer:: 멀티파트(이미지, 동영상, 파일) 데이터는 처리</h3>
+    <hr />
+    <h3>cookie-parser:: 요청에 동봉된 쿠키를 해석해 req.cookies 객체로 만듬</h3>
+    <p>app.use(cookieParser(비밀 키));</p>
+    <p>해석된 쿠키들은 req.cookies 객체에 들어감</p>
+    <p>유효 기간이 지난 쿠키는 알아서 걸러냄</p>
+    <p>
+      서명된 쿠키가 있는 경우, 제공한 비밀 키를 통해 해당 쿠키가 내 서버가 만든
+      쿠키임을 검증
+    </p>
+    <p>
+      쿠키는 클라이언트에서 위조하기 쉬우므로 비밀 키를 통해 만들어낸 서명을
+      쿠키 값 뒤에 붙입니다
+    </p>
+    <p>서명이 붙으면 쿠키가 name=zerocho.sign과 같은 모양</p>
+    <b>서명된 쿠키는 req.cookies 대신 req.signedCookies 객체</b>
+
+    <p>쿠키를 생성/제거하려면 res.cookie, res.clearCookie 메서드를 사용</p>
+    <p>res.cookie(키, 값, 옵션) 형식으로 사용</p>
+    <p>
+      res.cookie('name', 'zerocho', { expires: new Date(Date.now() + 900000),
+      httpOnly: true, secure: true, });
+    </p>
+    <p>res.clearCookie('name', 'zerocho', { httpOnly: true, secure: true });</p>
+    <b
+      >쿠키를 지우려면, 키와 값 외에 옵션도 정확히 일치해야 쿠키가 지워집니다.
+      단, expires나 maxAge 옵션은 일치할 필요가 없습니다</b
+    >
+    <p>signed라는 옵션이 있는데, 이를 true로 설정하면 쿠키 뒤에 서명이 붙음</p>
+    <hr />
+    <h3>
+      express-session:: 로그인 등의 이유로 세션을 구현하거나 특정 사용자를 위한
+      데이터를 임시적으로 저장해둘 때 매우 유용
+    </h3>
+    <p>세션은 사용자별로 req.session 객체 안에 유지</p>
+    <p>
+      app.use(session({ resave: false, saveUninitialized: false, secret:
+      process.env.COOKIE_SECRET, cookie: { httpOnly: true, secure: false, },
+      name: 'session-cookie', }));
+    </p>
+    <p>
+      resave: 요청이 올 때 세션에 수정 사항이 생기지 않더라도 세션을 다시
+      저장할지 설정
+    </p>
+    <p>
+      saveUninitialized: 세션에 저장할 내역이 없더라도 처음부터 세션을 생성할지
+      설정하는 것
+    </p>
+    <p>express-session은 세션 관리 시 클라이언트에 쿠키를 보냄 :: 세션쿠키</p>
+    <p>
+      안전하게 쿠키를 전송하려면 쿠키에 서명을 추가해야 하고, 쿠키를 서명하는 데
+      secret의 값이 필요 : 쿠키파서와 키값 동일하면 좋음
+    </p>
+    <p>
+      express-session에서 서명한 쿠키 앞에는 s: 붙고 , encodeURIComponent 함수가
+      실행되어 s%3A가 됨
+    </p>
+    <p>세션 쿠키의 이름은 name 옵션으로 설정합니다. 기본 이름은 connect.sid</p>
+    <hr />
+
+    <h3></h3>
+    <p>req.session.name = 'zerocho'; // 세션 등록</p>
+    <p>req.sessionID; // 세션 아이디 확인</p>
+    <p>req.session.destroy(); // 세션 모두 제거</p>
+    <hr />
+  </body>
+</html>
