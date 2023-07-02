@@ -5,16 +5,16 @@ const path = require("path");
 const session = require("express-session");
 const nunjucks = require("nunjucks");
 const dotenv = require("dotenv");
-const { sequelize } = require("./models");
+const passport = require("passport");
 
 dotenv.config();
 
-const pageRouter = require("./routes/page");
+const { sequelize } = require("./models");
+const passportConfig = require("./passport");
 
 const app = express();
-
-app.set("port", process.env.PORT || 3000);
-
+passportConfig(); // 패스포트 설정
+app.set("port", process.env.PORT || 3013);
 app.set("view engine", "html"); // nunjucks njk
 
 nunjucks.configure("views", {
@@ -33,6 +33,7 @@ sequelize
 
 app.use(morgan("dev"));
 app.use(express.static(path.join(__dirname, "public")));
+app.use("/img", express.static(path.join(__dirname, "uploads")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser(process.env.COOKIE_SECRET));
@@ -48,6 +49,19 @@ app.use(
   })
 );
 
+// 요청req객체에 passport 설정을 심음
+app.use(passport.initialize());
+// req.session 객체에 passport정보를 저장
+// express-session에서 생성하므로 passport 미들웨어는 express-session 미들웨어보다 뒤에 연결
+app.use(passport.session());
+
+const authRouter = require("./routes/auth");
+const postRouter = require("./routes/post");
+const pageRouter = require("./routes/page");
+
+app.use("/auth", authRouter);
+app.use("/post", postRouter);
+app.use("/auth", authRouter);
 app.use("/", pageRouter);
 
 app.use((req, res, next) => {
