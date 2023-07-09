@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const { apiLimiter, verifyToken } = require("../middlewares");
 const {
   tokenTest,
@@ -9,6 +10,7 @@ const {
 
 const router = express.Router();
 
+router.use(cors({ credentials: true }));
 // POST / v2 / token;
 
 router.post("/token", apiLimiter, createToken);

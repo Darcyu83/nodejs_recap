@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>express User</title>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+      document.querySelector("#root").textContent = `${{ yuds }}`;
+    </script>
+  </head>
+  <body>
+    <h1>main.html</h1>
+    <div id="root"></div>
+    <div id="root1">{{yuds}}</div>
+    <script>
+      axios
+        .post("http://localhost:4013/v2/token", {})
+        .then((res) => {
+          console.log(res);
+          document.querySelector("#root").textContent = JSON.stringify(
+            res.data.token
+          );
+        })
+        .catch((error) => console.log(error));
+    </script>
+  </body>
+</html>
