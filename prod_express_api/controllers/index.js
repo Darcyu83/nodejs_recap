@@ -1,5 +1,4 @@
 const { v4: uuidv4 } = require("uuid");
-
 const { User, Domain } = require("../models");
 
 exports.renderLogin = async (req, res, next) => {
