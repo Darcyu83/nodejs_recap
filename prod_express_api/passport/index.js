@@ -59,5 +59,5 @@ module.exports = () => {
   // deserializeUser 캐쉬하기 => 레디스 같은 데이터베이스에 사용자 정보를 캐싱
 
   local();
-  kakao();
+  // kakao();
 };
