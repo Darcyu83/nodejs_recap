@@ -103,3 +103,7 @@ export const test: RequestHandler = async (req, res, next) => {
     }
   }
 };
+
+export const renderMain: RequestHandler = (req, res, next) => {
+  res.render("main", { yuds: "yuds haha" });
+};

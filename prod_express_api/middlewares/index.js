@@ -1,6 +1,10 @@
 const jwt = require("jsonwebtoken");
 
 const { rateLimit } = require("express-rate-limit");
+
+const cors = require("cors");
+const { NON_EXECUTABLE_FILE_MODE } = require("patch-package/dist/patch/parse");
+
 exports.isLoggedIn = (req, res, next) => {
   if (req.isAuthenticated()) {
     next();
@@ -44,12 +48,12 @@ exports.verifyToken = (req, res, next) => {
 
 exports.apiLimiter = rateLimit({
   windowMs: 60 * 1000,
-  max: 1,
+  max: 10,
   handler(req, res) {
     res.status(this.statusCode).json({
       conde: this.statusCode, //기본값 429
 
-      message: "1분에 한번만 요청할 수 있습니다.",
+      message: "1분에 10번만 요청할 수 있습니다.",
     });
   },
 });
@@ -59,4 +63,16 @@ exports.deprecated = (req, res) => {
     code: 419,
     message: "새로운 버전이 나왔습니다. 새로운 버전을 사용하세요.",
   });
+};
+
+exports.corsWhenDomainMatches = async (req, res, next) => {
+  const domain = await Domain.findOne({
+    where: { host: new URL(req.get("origin")).host },
+  });
+
+  if (domain) {
+    cors({ credentials: true, origin: req.get("origin") })(req, res, next);
+  } else {
+    next();
+  }
 };
