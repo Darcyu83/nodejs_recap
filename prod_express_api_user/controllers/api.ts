@@ -4,10 +4,15 @@ import { RequestHandler } from "express";
 export const test: RequestHandler = async (req, res, next) => {
   try {
     console.log("api/test  ===== 0 ");
-    const result = await axios.get("http://localhost:4013/v1");
+    const result = await axios.get("http://localhost:4013/v1/test");
     console.log("api/test  ===== 1 ", result);
     return res.json(result.data);
-  } catch (error) {}
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      console.log("api/test  ===== 2 ", error.response?.data);
+      return res.json(error.response?.data);
+    }
+  }
 };
 
 export const getToken: RequestHandler = async (req, res, next) => {

@@ -1,6 +1,69 @@
 import axios, { AxiosError } from "axios";
-import { RequestHandler } from "express";
+import { Request, RequestHandler } from "express";
 import jwt from "jsonwebtoken";
+
+const URL = process.env.API_URL;
+
+axios.defaults.baseURL = URL;
+axios.defaults.headers.origin = process.env.ORIGIN!; //origin 헤더 추가
+
+export const requestAPI = async (req: Request, api: string): Promise<any> => {
+  try {
+    if (!req.session.jwt) {
+      const tokenResult: {
+        data: { code: number; message: string; token: string };
+      } = await axios.post(`/token`, {
+        clientSecret: process.env.CLIENT_SECRET,
+      });
+
+      req.session.jwt = tokenResult.data.token;
+    }
+
+    axios.defaults.headers["Authorization"] = req.session.jwt;
+
+    const result = await axios.get(`${api}`, {
+      headers: { Authorization: req.session.jwt },
+    });
+
+    return result;
+  } catch (error) {
+    console.error(error);
+
+    if (error instanceof AxiosError) {
+      if (error.response?.status === 419) {
+        delete req.session.jwt;
+        return requestAPI(req, api);
+      }
+    }
+
+    throw error;
+  }
+};
+
+export const getMyPosts: RequestHandler = async (req, res, next) => {
+  try {
+    const result = await requestAPI(req, "/posts/my");
+    res.json(result.data);
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+};
+export const searchByHashtag: RequestHandler = async (req, res, next) => {
+  try {
+    const result = await requestAPI(
+      req,
+      `/posts/hashtag/${encodeURIComponent(req.params.hashtag)}`
+    );
+
+    res.json(result.data);
+  } catch (error) {
+    if (error instanceof AxiosError && error.code) {
+      console.error(error);
+      next(error);
+    }
+  }
+};
 
 export const test: RequestHandler = async (req, res, next) => {
   console.log("세션 테스트  ===== 0 ");
