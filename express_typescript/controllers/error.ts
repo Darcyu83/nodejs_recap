@@ -1,6 +1,6 @@
 import express from "express";
 import { IErrorRequestHandlers, IRequestHandlers } from "./types";
-import { IResponseError } from "../routes/types";
+import { IResponseError } from "../api/routes/types";
 
 const errorController: IErrorRequestHandlers = {
   errorHandler: (error: IResponseError, req, res, next) => {

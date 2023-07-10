@@ -1,6 +1,5 @@
 import { RequestHandler } from "express";
 import { IRequestHandlers } from "./types";
-import { IResponseError } from "../routes/types";
 
 const indexController: IRequestHandlers = {
   index: (req, res, next) => {
@@ -10,7 +9,7 @@ const indexController: IRequestHandlers = {
     res.json({ message: "indexController index middleware2" });
   },
   error: (req, res, next) => {
-    const error: IResponseError = new Error("하하 임의로 에러 냈음");
+    const error = new Error("하하 임의로 에러 냈음");
     error.status = 444;
     next(error);
   },
